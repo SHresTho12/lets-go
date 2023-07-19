@@ -4,21 +4,35 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World")
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
 }
 
 // Add a snippetView handler function.
 
 func snippetView(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display a specific snippet..."))
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+	fmt.Fprintf(w, "Display a specific snippet... %d", id)
 }
 
 // Add a snippetCreate handler function.
 
 func snippetCreate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.Header().Set("Allow", "POST")
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	w.Write([]byte("Create a new snippet..."))
 }
 
