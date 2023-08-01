@@ -16,18 +16,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-	}
-	// Use the template.ParseFiles() function to read the files and store the templates in a template set. Notice that we can pass the slice of file paths as a variadic parameter?
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
@@ -37,11 +25,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%+v\n", snippet)
 	}
 
-	// Use the ExecuteTemplate() method to write the content of the "base"     // template as the response body.
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-	}
 }
 
 // Add a snippetView handler function.
@@ -62,6 +45,28 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Write the snippet data as a plain-text HTTP response body.
+
+	// Create an instance of a templateData struct holding the snippet data.
+	data := &templateData{
+		Snippet: snippet,
+	}
+
+	files := []string{
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/pages/view.tmpl.html",
+	}
+	// Use the template.ParseFiles() function to read the files and store the templates in a template set. Notice that we can pass the slice of file paths as a variadic parameter?
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// Use the ExecuteTemplate() method to write the content of the "base"     // template as the response body.
+	err = ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.serverError(w, err)
+	}
 
 	fmt.Fprintf(w, "%v", snippet)
 
