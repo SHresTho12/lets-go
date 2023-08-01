@@ -20,7 +20,7 @@ type application struct {
 func main() {
 
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "root:root@tcp(localhost:3306)/snippetbox?charset=utf8", "MySQL data source name")
+	dsn := flag.String("dsn", "root:root@tcp(localhost:3306)/snippetbox?charset=utf8&parseTime=true", "MySQL data source name")
 	//dsn := flag.String("dsn", "web:pass@tcp(172.17.0.1:3306)/snippetbox?charset=utf8", "MySQL data source name")
 
 	// Register the two new handler functions and corresponding URL patterns with // the servemux, in exactly the same way that we did before.
