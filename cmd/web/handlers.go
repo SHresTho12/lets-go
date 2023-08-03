@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"text/template"
 
 	"github.com/SHresTho12/lets-go/internal/models"
 )
@@ -21,26 +20,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-	}
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	// Create an instance of a templateData struct holding the slice of
-	// snippets.
-	data := &templateData{
+	app.render(w, http.StatusOK, "home.tmpl.html", &templateData{
 		Snippets: snippets,
-	}
-	// Pass in the templateData struct when executing the template.
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	})
 }
 
 // Add a snippetView handler function.
@@ -62,29 +44,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	}
 	// Write the snippet data as a plain-text HTTP response body.
 
-	// Create an instance of a templateData struct holding the snippet data.
-	data := &templateData{
-		Snippet: snippet,
-	}
-
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/view.tmpl.html",
-	}
-	// Use the template.ParseFiles() function to read the files and store the templates in a template set. Notice that we can pass the slice of file paths as a variadic parameter?
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	// Use the ExecuteTemplate() method to write the content of the "base"     // template as the response body.
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
-
-	fmt.Fprintf(w, "%v", snippet)
+	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{Snippet: snippet})
 
 }
 
